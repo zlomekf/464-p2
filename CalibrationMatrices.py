@@ -50,6 +50,13 @@ class CalibrationMatrices():
             self.interpolated = self.interpolated.T
 
         self.construct_interpolation()
+        print(self.interpolated.shape)
+
+        for i in range(0, self.interpolated.shape[1]):
+          values = self.interpolated[0,i]
+          print(i)
+          print(values)
+        
         plt.imshow(self.interpolated, cmap='hot', interpolation='nearest')
         plt.show()
 

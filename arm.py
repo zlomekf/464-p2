@@ -18,14 +18,15 @@ class WritingPlan(Plan):
       while app.nbr.ln:
         ts = app.nbr.ts.pop()
         ln = app.nbr.ln.pop()
-        if(len(ln) == 4):
-          BASE_read = int(ln[0])
-          ELBOW_read = int(ln[1])
-          WRIST_read = int(ln[2])
+
+        if len(ln) == 6:
+          BASE_read  = int(ln[0]) + (int(ln[1]) << 8)
+          ELBOW_read = int(ln[2]) + (int(ln[3]) << 8)
+          WRIST_read = int(ln[4]) + (int(ln[5]) << 8)
           ##flip base direction
-          app.readPots.SHOULDER_POS = app.readPots.pot_to_degree(int(255 -BASE_read))
-          app.readPots.ELBOW_POS = app.readPots.pot_to_degree(int(255 - ELBOW_read + (90 + 13) * 255/270))
-          app.readPots.WRIST_POS = app.readPots.pot_to_degree(int(255 - WRIST_read))
+          app.readPots.SHOULDER_POS = app.readPots.pot_to_degree(int(1023 -BASE_read))
+          app.readPots.ELBOW_POS = app.readPots.pot_to_degree(int(1023 - ELBOW_read + (90 + 13) * 1023/270))
+          app.readPots.WRIST_POS = app.readPots.pot_to_degree(int(1023 - WRIST_read))
       app.wrist.set_pos(app.readPots.WRIST_POS)
       yield 0.01
       app.elbow.set_pos(app.readPots.ELBOW_POS)
