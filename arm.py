@@ -190,12 +190,14 @@ class ControllerApp( JoyApp ):
     """
 
     # Set mode to 0 to use set_pos function
-    self.wrist.set_mode(0)
+    #self.wrist.set_mode(0)
     self.elbow.set_mode(0)
     self.shoulder.set_mode(2)
+
+    self.wrist.set_mode(1)
     
     # Set speeds of all motors
-    self.wrist.set_speed(0.5)
+    #self.wrist.set_speed(0.5)
     self.elbow.set_speed(0.5)
     self.shoulder.set_speed(0.5)
     
@@ -217,10 +219,10 @@ class ControllerApp( JoyApp ):
 
   def onEvent( self, evt ):
     
-    w = self.wrist.set_pos
+    #w = self.wrist.set_pos
     e = self.elbow.set_pos
     s = self.shoulder.set_pos
-    lw = self.wrist.get_pos
+    #lw = self.wrist.get_pos
     le = self.elbow.get_pos
     ls = self.shoulder.get_pos
     
@@ -228,11 +230,13 @@ class ControllerApp( JoyApp ):
     
     if evt.type == KEYDOWN:
       if evt.key == K_a:
-        w(lw() + 500) # 1000 = 10 degree increment
-        progress("Wrist Up, increment w")
+        #w(lw() + 500) # 1000 = 10 degree increment
+        #progress("Wrist Up, increment w")
+        self.wrist.set_torque(0.2)
       elif evt.key == K_z:
-        w(lw() - 500) # -1000 = 10 degree decrement
-        progress("Wrist Down, decrement w")
+        # w(lw() - 500) # -1000 = 10 degree decrement
+        # progress("Wrist Down, decrement w")
+        self.wrist.set_torque(-0.05)
       elif evt.key == K_s:
         e(le() + 500)
         progress("Shoulder Up, increment e")
