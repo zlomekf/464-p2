@@ -54,8 +54,9 @@ class calibrationPlayback(Plan):
   def behavior(self):
     app.calibrationP.construct_interpolation()
     yield 0.1
-    
+    progress(str(app.calibrationP.interpolated.shape[1]))
     for i in range(0, app.calibrationP.interpolated.shape[1]):
+          progress(str(i))
           values = app.calibrationP.interpolated[0,i]
           self.app.wrist.set_pos(values[0])
           self.app.elbow.set_pos(values[1])
