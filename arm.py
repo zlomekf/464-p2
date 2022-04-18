@@ -97,7 +97,7 @@ class calibrationPlayback(Plan):
     app.calibrationP.construct_interpolation()
     yield 1
     self.curr_x = self.center_x -self.scale - 2
-    self.curr_y = self.center_y + self.scale
+    self.curr_y = self.center_y - self.scale
     yield self.set_motors()
     yield 5
 
