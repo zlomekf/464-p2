@@ -55,18 +55,132 @@ class recordingPlan(Plan):
 class calibrationPlayback(Plan):
   def __init__(self, app, *arg, **kwargs):
     Plan.__init__(self,app)
+    self.center_x = 10
+    self.center_y = 15
+    self.scale = 4
+
+    self.curr_x = 0
+    self.curr_y = 0
 
   def behavior(self):
     app.calibrationP.construct_interpolation()
     yield 1
-    progress(str(app.calibrationP.interpolated.shape[1]))
-    for i in range(0, app.calibrationP.interpolated.shape[1]):
-          progress(str(i))
-          values = app.calibrationP.interpolated[0,i]
-          self.app.wrist.set_pos(values[0])
-          self.app.elbow.set_pos(values[1])
-          self.app.shoulder.set_pos(values[2])
-          yield 4
+
+    '''
+    progress("go to 0,0")
+    self.curr_x = 0
+    self.curr_y = 0
+    yield self.set_motors()
+    yield 10
+
+    progress("go to max,0")
+    self.curr_x = app.calibrationP.interpolated.shape[1] - 1
+    self.curr_y = 0
+    yield self.set_motors()
+    yield 10
+
+    progress("go to max,max")
+    self.curr_x = app.calibrationP.interpolated.shape[1] - 1
+    self.curr_y = app.calibrationP.interpolated.shape[0] -1
+    yield self.set_motors()
+    yield 10
+
+    progress("go to 0,max")
+    self.curr_x = 0
+    self.curr_y = app.calibrationP.interpolated.shape[0] - 1
+    yield self.set_motors()
+    yield 10
+    '''
+
+    
+    progress("go to initial")
+    app.calibrationP.construct_interpolation()
+    yield 1
+    self.curr_x = self.center_x -self.scale - 2
+    self.curr_y = self.center_y + self.scale
+    yield self.set_motors()
+    yield 5
+
+    progress("move right")
+    #top horizontal
+    for i in range(0, 2*self.scale + 4):
+      self.curr_x += 1
+      yield self.set_motors()
+
+    # progress("overshoot")
+    # #overshoot
+    # self.curr_x -= 1
+    # self.curr_y -= 1
+    # yield self.set_motors()
+    # self.curr_x -= 1
+    # self.curr_y -= 1
+    # yield self.set_motors()
+
+    progress("move down")
+    #right vertical
+    for i in range(0, 2*self.scale + 4):
+      self.curr_y += 1
+      yield self.set_motors()
+
+    # progress("overshoot")
+    # #overshoot
+    # self.curr_x += 1
+    # self.curr_y -= 1
+    # yield self.set_motors()
+    # self.curr_x += 1
+    # self.curr_y -= 1
+    # yield self.set_motors()
+    
+    progress("move left")
+    #bottom horizontal
+    for i in range(0, 2*self.scale + 4):
+      self.curr_x -= 1
+      yield self.set_motors()
+
+    # progress("overshoot")
+    # #overshoot
+    # self.curr_x += 1
+    # self.curr_y += 1
+    # yield self.set_motors()
+    # self.curr_x += 1
+    # self.curr_y += 1
+    # yield self.set_motors()
+
+    progress("move up")
+    #left vertical
+    for i in range(0, 2*self.scale + 4):
+      self.curr_y -= 1
+      yield self.set_motors()
+
+    # progress("overshoot")
+    # #overshoot
+    # self.curr_x -= 1
+    # self.curr_y += 1
+    # yield self.set_motors()
+    # self.curr_x -= 1
+    # self.curr_y += 1
+    # yield self.set_motors()
+
+    yield
+    ##LINE
+    # progress(str(app.calibrationP.interpolated.shape[1]))
+    # for i in range(0, app.calibrationP.interpolated.shape[1]):
+    #       progress(str(i))
+    #       values = app.calibrationP.interpolated[0,i]
+    #       self.app.wrist.set_pos(values[0])
+    #       self.app.elbow.set_pos(values[1])
+    #       self.app.shoulder.set_pos(values[2])
+    #       yield 1
+  
+  def set_motors(self):
+    values = app.calibrationP.interpolated[self.curr_y,self.curr_x]
+    self.app.wrist.set_pos(values[0])
+    self.app.elbow.set_pos(values[1])
+    self.app.shoulder.set_pos(values[2])
+    yield 1
+
+
+
 
 
 
@@ -375,6 +489,19 @@ class ControllerApp( JoyApp ):
 
       elif evt.key == K_h:
         self.calibrationP.measured = np.load("calibration.npy")
+
+      elif evt.key == K_v:
+        self.wrist.set_mode(1)
+        self.wrist.go_slack()
+        self.elbow.set_mode(1)
+        self.elbow.go_slack()
+        self.shoulder.set_mode(1)
+        self.shoulder.go_slack()
+      
+      elif evt.key == K_f:
+        self.wrist.set_mode(0)
+        self.elbow.set_mode(0)
+        self.shoulder.set_mode(2)
 
       
     ### DO NOT MODIFY -----------------------------------------------
