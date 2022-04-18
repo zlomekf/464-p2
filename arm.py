@@ -7,6 +7,7 @@ import ckbot
 from ReadPots import *
 import sys, os
 from CalibrationMatrices import *
+import numpy as np
 
 
 class WritingPlan(Plan):
@@ -24,8 +25,12 @@ class WritingPlan(Plan):
           WRIST_read = int(ln[2])
           ##flip base direction
           app.readPots.SHOULDER_POS = app.readPots.pot_to_degree(int(255 -BASE_read))
-          app.readPots.ELBOW_POS = app.readPots.pot_to_degree(int(ELBOW_read - (90 + 13) * 255/270))
+          app.readPots.ELBOW_POS = app.readPots.pot_to_degree(int(ELBOW_read + (90 + 13) * 255/270))
           app.readPots.WRIST_POS = app.readPots.pot_to_degree(int(255 - WRIST_read))
+      
+      #progress(str(ELBOW_read))
+      #progress(str(app.readPots.ELBOW_POS))
+      #yield 0.1
       app.wrist.set_pos(app.readPots.WRIST_POS)
       yield 0.01
       app.elbow.set_pos(app.readPots.ELBOW_POS)
@@ -53,7 +58,7 @@ class calibrationPlayback(Plan):
 
   def behavior(self):
     app.calibrationP.construct_interpolation()
-    yield 0.1
+    yield 1
     progress(str(app.calibrationP.interpolated.shape[1]))
     for i in range(0, app.calibrationP.interpolated.shape[1]):
           progress(str(i))
@@ -61,7 +66,7 @@ class calibrationPlayback(Plan):
           self.app.wrist.set_pos(values[0])
           self.app.elbow.set_pos(values[1])
           self.app.shoulder.set_pos(values[2])
-          yield 1
+          yield 4
 
 
 
@@ -355,7 +360,7 @@ class ControllerApp( JoyApp ):
           else:
             r = self.measure_index // self.calibrationP.NUM_Y
             c = self.measure_index % self.calibrationP.NUM_Y
-          progress("Next measure at [" + str(r) + "," 
+          progress("Measured at [" + str(r) + "," 
             + str(c) +"]")
           currPos = (self.wrist.get_pos(), self.elbow.get_pos(), self.shoulder.get_pos())
           self.calibrationP.measured[r,c] = currPos
@@ -364,6 +369,13 @@ class ControllerApp( JoyApp ):
       
       elif evt.key == K_b:
         self.calPlaybackP.start()
+      
+      elif evt.key == K_g:
+        np.save("calibration", self.calibrationP.measured)
+
+      elif evt.key == K_h:
+        self.calibrationP.measured = np.load("calibration.npy")
+
       
     ### DO NOT MODIFY -----------------------------------------------
     else:# Use superclass to show any other events

@@ -10,7 +10,7 @@ class CalibrationMatrices():
 
         self.DIST = 4 #distance in CM between calibration points
         self.NUM_X = 5
-        self.NUM_Y = 7
+        self.NUM_Y = 6
 
         self.measured = np.zeros((self.NUM_Y, self.NUM_X, 3))
         self.interpolated = np.zeros((self.DIST*self.NUM_Y - (self.DIST-1), self.DIST*self.NUM_X - (self.DIST-1), 3))
