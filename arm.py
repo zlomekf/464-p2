@@ -13,30 +13,33 @@ import numpy as np
 class WritingPlan(Plan):
   def __init__(self, app, *arg,**kwargs):
     Plan.__init__(self,app)
-
+    self.max_pot = app.readPots.max_pot
+  
   def behavior(self):
     while(True):
       while app.nbr.ln:
         ts = app.nbr.ts.pop()
         ln = app.nbr.ln.pop()
-        if(len(ln) == 4):
-          BASE_read = int(ln[0])
-          ELBOW_read = int(ln[1])
-          WRIST_read = int(ln[2])
+        progress("len: "+ str(len(ln)))
+        if(len(ln) == 7):
+          BASE_read = int(ln[0]) | (int(ln[1]) & 0xF) << 8
+          ELBOW_read = int(ln[2]) | (int(ln[3]) & 0xF) << 8
+          WRIST_read = int(ln[4]) | (int(ln[5]) & 0xF) << 8
           ##flip base direction
-          app.readPots.SHOULDER_POS = app.readPots.pot_to_degree(int(255 -BASE_read))
-          app.readPots.ELBOW_POS = app.readPots.pot_to_degree(int(ELBOW_read + (90 + 13) * 255/270))
-          app.readPots.WRIST_POS = app.readPots.pot_to_degree(int(255 - WRIST_read))
-      
-      #progress(str(ELBOW_read))
+          app.readPots.SHOULDER_POS = app.readPots.pot_to_degree(int(self.max_pot -BASE_read))
+          app.readPots.ELBOW_POS = app.readPots.pot_to_degree(int(ELBOW_read + (90 + 13) * self.max_pot/270))
+          app.readPots.WRIST_POS = app.readPots.pot_to_degree(int(self.max_pot - WRIST_read))
+        app.wrist.set_pos(app.readPots.WRIST_POS)
+        yield 0.1
+        app.elbow.set_pos(app.readPots.ELBOW_POS)
+        yield 0.01
+        app.shoulder.set_pos(app.readPots.SHOULDER_POS)
+        yield 0.01
+      # progress(str(BASE_read))
+      # progress(str(ELBOW_read))
+      # progress(str(WRIST_read))
+      # progress("")
       #progress(str(app.readPots.ELBOW_POS))
-      #yield 0.1
-      app.wrist.set_pos(app.readPots.WRIST_POS)
-      yield 0.01
-      app.elbow.set_pos(app.readPots.ELBOW_POS)
-      yield 0.01
-      app.shoulder.set_pos(app.readPots.SHOULDER_POS)
-      yield 0.01
       #progress("here")
       #yield 0.01
         
@@ -55,8 +58,8 @@ class recordingPlan(Plan):
 class calibrationPlayback(Plan):
   def __init__(self, app, *arg, **kwargs):
     Plan.__init__(self,app)
-    self.center_x = 10
-    self.center_y = 15
+    self.center_x = 0
+    self.center_y = 0
     self.scale = 4
 
     self.curr_x = 0
@@ -64,6 +67,9 @@ class calibrationPlayback(Plan):
 
   def behavior(self):
     app.calibrationP.construct_interpolation()
+    yield 1
+
+    self.adjust_target()
     yield 1
 
     '''
@@ -178,6 +184,20 @@ class calibrationPlayback(Plan):
     self.app.elbow.set_pos(values[1])
     self.app.shoulder.set_pos(values[2])
     yield 1
+
+  def adjust_target(self):
+    if self.center_x - self.scale - 2 < 0:
+      self.center_x -= self.center_x - self.scale - 2
+      progress("Adjusted x target to: " + str(self.center_x))
+    if self.center_x + self.scale + 2 > 20:
+      self.center_x -= (self.center_x + self.scale + 2)-20
+      progress("Adjusted x target to: " + str(self.center_x))
+    if self.center_y - self.scale - 2 < 0:
+      self.center_y -= self.center_y - self.scale - 2
+      progress("Adjusted y target to: " + str(self.center_y))
+    if self.center_y + self.scale + 2 > 24:
+      self.center_y -= (self.center_y + self.scale + 2) -24
+      progress("Adjusted y target to: " + str(self.center_y))
 
 
 

@@ -8,12 +8,14 @@ class ReadPots():
         self.ELBOW_POS = elbow_pos
         self.WRIST_POS = wrist_pos
 
+        self.max_pot = 1023
+
     def pot_to_degree(self, pot_val):
         # scale 0 - 255 to +-128
-        dist = pot_val - 128.0
+        dist = pot_val - self.max_pot/2
 
         #+-128 to +-135 degrees
-        deg = (dist / 128.0) * 13500
+        deg = (dist / (self.max_pot/2)) * 13500
 
         #saturation at 90 degrees
         if(deg < -9000):
