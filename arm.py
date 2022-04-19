@@ -26,22 +26,24 @@ class WritingPlan(Plan):
           ELBOW_read = int(ln[2]) | (int(ln[3]) & 0xF) << 8
           WRIST_read = int(ln[4]) | (int(ln[5]) & 0xF) << 8
           ##flip base direction
-          app.readPots.SHOULDER_POS = app.readPots.pot_to_degree(int(self.max_pot -BASE_read))
-          app.readPots.ELBOW_POS = app.readPots.pot_to_degree(int(ELBOW_read + (90 + 13) * self.max_pot/270))
-          app.readPots.WRIST_POS = app.readPots.pot_to_degree(int(self.max_pot - WRIST_read))
+          app.readPots.SHOULDER_POS = app.readPots.pot_to_degree(int(BASE_read))
+          app.readPots.ELBOW_POS = app.readPots.pot_to_degree(int(self.max_pot - ELBOW_read - (self.max_pot/2 - 150)))
+          app.readPots.WRIST_POS = app.readPots.pot_to_degree(int(WRIST_read + (self.max_pot/2 - 860)))
           yield 0.01
+          #progress(str(BASE_read))
+          #progress(str(ELBOW_read))
+          #progress(str(WRIST_read))
+          #progress(str(app.readPots.SHOULDER_POS))
+          #progress(str(app.readPots.ELBOW_POS))
+          #progress(str(app.readPots.WRIST_POS))
+          #progress("")
+          #yield 1
         app.wrist.set_pos(app.readPots.WRIST_POS)
         yield 0.1
         app.elbow.set_pos(app.readPots.ELBOW_POS)
         yield 0.01
         app.shoulder.set_pos(app.readPots.SHOULDER_POS)
         yield 0.01
-      # progress(str(ELBOW_read))
-      # progress(str(WRIST_read))
-      # progress("")
-      #progress(str(app.readPots.ELBOW_POS))
-      #progress("here")
-      #yield 0.01
         
 
 class recordingPlan(Plan):
