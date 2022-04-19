@@ -20,7 +20,7 @@ class WritingPlan(Plan):
       while app.nbr.ln:
         ts = app.nbr.ts.pop()
         ln = app.nbr.ln.pop()
-        progress("len: "+ str(len(ln)))
+        #progress("len: "+ str(len(ln)))
         if(len(ln) == 7):
           BASE_read = int(ln[0]) | (int(ln[1]) & 0xF) << 8
           ELBOW_read = int(ln[2]) | (int(ln[3]) & 0xF) << 8
@@ -29,13 +29,13 @@ class WritingPlan(Plan):
           app.readPots.SHOULDER_POS = app.readPots.pot_to_degree(int(self.max_pot -BASE_read))
           app.readPots.ELBOW_POS = app.readPots.pot_to_degree(int(ELBOW_read + (90 + 13) * self.max_pot/270))
           app.readPots.WRIST_POS = app.readPots.pot_to_degree(int(self.max_pot - WRIST_read))
+          yield 0.01
         app.wrist.set_pos(app.readPots.WRIST_POS)
         yield 0.1
         app.elbow.set_pos(app.readPots.ELBOW_POS)
         yield 0.01
         app.shoulder.set_pos(app.readPots.SHOULDER_POS)
         yield 0.01
-      # progress(str(BASE_read))
       # progress(str(ELBOW_read))
       # progress(str(WRIST_read))
       # progress("")
