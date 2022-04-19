@@ -23,8 +23,8 @@ while(True):
     print(len(line))
     print(line)
     if len(line) == 7:
-        x = int(line[0]) | int(line[1]) << 8
-        y = int(line[2]) | int(line[3]) << 8
-        z = int(line[4]) | int(line[5]) << 8
+        x = int(line[0]) | (int(line[1]) & 0x0F) << 8
+        y = int(line[2]) | (int(line[3]) & 0x0F) << 8
+        z = int(line[4]) | (int(line[5]) & 0x0F) << 8
         print((x,y,z))
     time.sleep(0.01)
