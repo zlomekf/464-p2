@@ -363,22 +363,22 @@ class ControllerApp( JoyApp ):
     
     if evt.type == KEYDOWN:
       if evt.key == K_a:
-        w(lw() + 500) # 1000 = 10 degree increment
+        w(lw() + 200) # 1000 = 10 degree increment
         progress("Wrist Up, increment w")
       elif evt.key == K_z:
-        w(lw() - 500) # -1000 = 10 degree decrement
+        w(lw() - 200) # -1000 = 10 degree decrement
         progress("Wrist Down, decrement w")
       elif evt.key == K_s:
-        e(le() + 500)
+        e(le() + 300)
         progress("Shoulder Up, increment e")
       elif evt.key == K_x:
-        e(le() - 500)
+        e(le() - 300)
         progress("Shoulder Down, decrement e")
       elif evt.key == K_d:
-        s(ls() + 1000)
+        s(ls() + 200)
         progress("Turn Right, increment s")
       elif evt.key == K_c:
-        s(ls() - 1000)
+        s(ls() - 200)
         progress("Turn Left, decrement s")
         
       # "Easy" Mode Recordings
@@ -478,8 +478,14 @@ class ControllerApp( JoyApp ):
         #progress("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM")
         self.manual_mode = not self.manual_mode
         if self.manual_mode:
+          self.wrist.set_speed(4)
+          self.elbow.set_speed(2)
+          self.shoulder.set_speed(2)
           self.writingP.start()
         else:
+          self.wrist.set_speed(0.5)
+          self.elbow.set_speed(0.5)
+          self.shoulder.set_speed(0.5)
           self.writingP.stop()
 
       elif evt.key == K_n:
